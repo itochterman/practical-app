@@ -51,3 +51,5 @@ Utilize the "microservices" directory to assist with some data visualizations. W
 Add the ability to resize the charts, and have the new size persist when the page is refreshed.
 
 Create a treeview component with a few made-up hosts that would return a similar dashboard (but keep in mind our API only returns data for the one host)
+
+Please add your own eye and style this page as you'd like!
