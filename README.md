@@ -46,10 +46,11 @@ There may be a few technical issues with this code, please do your best to resol
 
 Add a few visualizations of the data returned from the API.
 
-Utilize the "microservices" directory to assist with some data visualizations. We've included tests for one such visualization, a simple panel that displays, based on the data provided, if the host is "UP" or "DOWN".
+Utilize the "microservices" directory to assist with some data visualizations. We've included tests for one such visualization, a simple panel that displays, based on the data provided, if the host is "UP" or "DOWN". Please make all of these pass, and feel free
+to add new ones for any others you want to add.
 
 Add the ability to resize the charts, and have the new size persist when the page is refreshed.
 
-Create a treeview component with a few made-up hosts that would return a similar dashboard (but keep in mind our API only returns data for the one host)
+Create a treeview component with host we provided, and add a few made-up hosts that would return a similar dashboard (but keep in mind our API only returns data for the one host)
 
 Please add your own eye and style this page as you'd like!
