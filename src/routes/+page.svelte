@@ -4,6 +4,7 @@
 
 	let pieChartCanvas: HTMLCanvasElement;
 	let lineChartCanvas: HTMLCanvasElement;
+	let pieChart: Chart;
 	let lineChart: Chart;
 
 	async function fetchGraphiteData() {
@@ -24,10 +25,90 @@
 			lineChart.update();
 		}
 	}
+	function updatePieChart(data: any) {
+		if (pieChart) {
+			pieChart.update();
+		}
+	}
 
 	onMount(async () => {
+		const pieChartContainer = document.getElementById('pie-chart-container')!;
+		const lineChartContainer = document.getElementById('line-chart-container')!;
+
+		let startX: number,
+			startY: number,
+			startXLine: number,
+			startYLine: number,
+			startWidthLine: number,
+			startHeightLine: number,
+			startWidth: number,
+			startHeight: number,
+			draggingLine = false,
+			dragging = false;
+
+		pieChartContainer.addEventListener('mousedown', (e) => {
+			dragging = true;
+			startX = e.clientX;
+			startY = e.clientY;
+			startWidth = pieChartContainer.offsetWidth;
+			startHeight = pieChartContainer.offsetHeight;
+			pieChartContainer.style.cursor = 'grabbing';
+		});
+
+		lineChartContainer.addEventListener('mousedown', (e) => {
+			draggingLine = true;
+			startXLine = e.clientX;
+			startYLine = e.clientY;
+			startWidthLine = lineChartContainer.offsetWidth;
+			startHeightLine = lineChartContainer.offsetHeight;
+			lineChartContainer.style.cursor = 'grabbing';
+		});
+		document.addEventListener('mousemove', (e) => {
+			if (dragging) {
+				const dx = e.clientX - startX;
+				const dy = e.clientY - startY;
+
+				pieChartContainer.style.width = `${startWidth + dx}px`;
+				pieChartContainer.style.height = `${startHeight + dy}px`;
+			}
+			if (draggingLine) {
+				const dx = e.clientX - startXLine;
+				const dy = e.clientY - startYLine;
+				lineChartContainer.style.width = `${startWidthLine + dx}px`;
+				lineChartContainer.style.height = `${startHeightLine + dy}px`;
+			}
+		});
+
+		document.addEventListener('mouseup', () => {
+			if (dragging) {
+				dragging = false;
+				pieChartContainer.style.cursor = 'grab';
+
+				// Save size to localStorage
+				localStorage.setItem('containerWidth', pieChartContainer.offsetWidth);
+				localStorage.setItem('containerHeight', pieChartContainer.offsetHeight);
+			}
+
+			if (draggingLine) {
+				draggingLine = false;
+				lineChartContainer.style.cursor = 'grab';
+				localStorage.setItem('lineContainerWidth', lineChartContainer.offsetWidth);
+				localStorage.setItem('lineContainerHeight', lineChartContainer.offsetHeight);
+			}
+		});
+		// Load size from localStorage if available
+		const savedWidth = localStorage.getItem('containerWidth');
+		const savedHeight = localStorage.getItem('containerHeight');
+		const lineWidth = localStorage.getItem('lineContainerWidth');
+		const lineHeight = localStorage.getItem('lineContainerHeight');
+
+		pieChartContainer.style.width = `${savedWidth}px`;
+		pieChartContainer.style.height = `${savedHeight}px`;
+		lineChartContainer.style.width = `${lineWidth}px`;
+		lineChartContainer.style.height = `${lineHeight}px`;
+
 		// Pie Chart
-		new Chart(pieChartCanvas, {
+		pieChart = new Chart(pieChartCanvas, {
 			type: 'pie',
 			data: {
 				labels: ['Red', 'Blue', 'Yellow'],
@@ -66,7 +147,7 @@
 
 		// Fetch and update data
 		const graphiteData = await fetchGraphiteData();
-    console.log('graphite data: ', graphiteData)
+		console.log('graphite data: ', graphiteData);
 		if (graphiteData && Array.isArray(graphiteData[0]?.datapoints)) {
 			// updateLineChart(graphiteData[0].datapoints);
 		}
@@ -78,13 +159,13 @@
 <h2>Data For: vigilant-vino-iamr-02</h2>
 
 <div class="chart-grid">
-	<div class="chart-container">
+	<div class="chart-container" id="pie-chart-container">
 		<h2>Pie Chart</h2>
 		<canvas bind:this={pieChartCanvas}></canvas>
 	</div>
-	<div class="chart-container">
+	<div class="chart-container" id="line-chart-container">
 		<h2>Line Chart</h2>
-		<canvas this={lineChartCanvas}></canvas>
+		<canvas bind:this={lineChartCanvas}></canvas>
 	</div>
 </div>
 
@@ -97,8 +178,8 @@
 	}
 
 	.chart-container {
-		height: 300px;
-		width: 100%;
+		width: 200px;
+		height: 200px;
 	}
 
 	canvas {

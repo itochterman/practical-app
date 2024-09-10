@@ -46,7 +46,7 @@ describe('upOrDown function', () => {
 	});
 
 	test('should return DOWN for edge case with 60% up', async () => {
-		const data = [...Array(60).fill([0, 1234567890]), ...Array(40).fill([1, 1234567890])];
+		const data = [...Array(60).fill([1, 1234567890]), ...Array(40).fill([0, 1234567890])];
 		const result = await runPythonFunction(data);
 		expect(result).toBe('DOWN');
 	});
