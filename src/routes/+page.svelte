@@ -1,11 +1,17 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import Chart from 'chart.js/auto';
+	import TreeView from '../tree/TreeView.svelte';
 
 	let pieChartCanvas: HTMLCanvasElement;
 	let lineChartCanvas: HTMLCanvasElement;
-	let pieChart: Chart;
-	let lineChart: Chart;
+	let pieChart: Chart<'pie', number[], string>;
+	let lineChart: Chart<'line', never[], never>;
+
+	// let treeData: never[] = [];
+	let loading = true;
+	let error = null;
+	let treeData = [];
 
 	async function fetchGraphiteData() {
 		try {
@@ -85,15 +91,15 @@
 				pieChartContainer.style.cursor = 'grab';
 
 				// Save size to localStorage
-				localStorage.setItem('containerWidth', pieChartContainer.offsetWidth);
-				localStorage.setItem('containerHeight', pieChartContainer.offsetHeight);
+				localStorage.setItem('containerWidth', String(pieChartContainer.offsetWidth));
+				localStorage.setItem('containerHeight', String(pieChartContainer.offsetHeight));
 			}
 
 			if (draggingLine) {
 				draggingLine = false;
 				lineChartContainer.style.cursor = 'grab';
-				localStorage.setItem('lineContainerWidth', lineChartContainer.offsetWidth);
-				localStorage.setItem('lineContainerHeight', lineChartContainer.offsetHeight);
+				localStorage.setItem('lineContainerWidth', String(lineChartContainer.offsetWidth));
+				localStorage.setItem('lineContainerHeight', String(lineChartContainer.offsetHeight));
 			}
 		});
 		// Load size from localStorage if available
@@ -147,9 +153,13 @@
 
 		// Fetch and update data
 		const graphiteData = await fetchGraphiteData();
+		loading = false;
 		console.log('graphite data: ', graphiteData);
 		if (graphiteData && Array.isArray(graphiteData[0]?.datapoints)) {
-			// updateLineChart(graphiteData[0].datapoints);
+			updateLineChart(graphiteData[0].datapoints);
+			treeData = graphiteData[0].datapoints.map((point) => {
+				return [point[0], [point[1]]];
+			});
 		}
 	});
 </script>
@@ -167,6 +177,11 @@
 		<h2>Line Chart</h2>
 		<canvas bind:this={lineChartCanvas}></canvas>
 	</div>
+</div>
+
+<div class="chart-container" id="treeview-chart-container">
+	<h2>Tree View</h2>
+	<TreeView data={treeData} />
 </div>
 
 <style>
