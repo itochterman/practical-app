@@ -18,6 +18,8 @@ func main() {
 }
 
 func getGraphiteData(c *gin.Context) {
+
+	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 	apiURL := "https://553f5731-6546-4660-bca9-42e8866c0cf9.mock.pstmn.io/v1/vpchelper/?host=vigilant-vino-iamr-02&action=GET&aws_region=us-east-2&service=graphite"
 	apiData := map[string]string{
 		"path":    "/render/?target=virgil.gov-vigilant-nat-01.host.hostalive.perfdata.pl.value&format=json&from=-90d&to=-30d",
